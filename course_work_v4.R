@@ -252,7 +252,8 @@ area_NLCD <- raster::projectRaster(from = area_NLCD,
 area_NLCD_merc <- projectRaster(area_NLCD,crs = merc_crs,method = "ngb")
 
 unique(area_NLCD$NLCD_2016_Land_Cover_L48)
-nlcdclass <- fread("NLCD_classes.csv")
+nlcdclass <- fread("https://raw.githubusercontent.com/julianscott/ZonalStats/master/NLCD_classes.csv")
+
 nlcdclass
 
 cover_map <- tm_shape(area_NLCD_merc)+
