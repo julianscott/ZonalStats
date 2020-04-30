@@ -28,7 +28,7 @@ help(package="sf")
 ?raster
 
 # tidyverse: provides raft of useful packages including:
-#             -ggplot2: Create Elegant Data Visualisations Using the 
+#             -ggplot2: Create Elegant Data Visualizations Using the 
 #                     Grammar of Graphics (gg)
 #             -dplyr: a flexible grammar of data manipulation. 
 #             - lots of other useful packages
@@ -39,36 +39,35 @@ help(package="sf")
 
 # nhdplusTools: Tools for traversing and working with National Hydrography Dataset Plus (NHDPlus) data. 
 
-# FedData: Functions to Automate Downloading Geospatial Data Available from Several Federated Data Sources. NED, NHD, SSURGO, DAYMET, historic climate,tree ring data, national land cover databset, and more. 
+# FedData: Functions to Automate Downloading Geospatial Data Available from Several Federated Data Sources. NED, NHD, SSURGO, DAYMET, historic climate, tree ring data, national land cover dataset, and more. 
 help(package="FedData")
 
 ##########################################
 # Zonal Statistics in R
-# . RStudio bonus tip: use 'Projects'
-# . Accessing watershed polygons in R
-# . Writing/reading shapefiles
-# . Calculating polygon area
-# . Accessing elevation and land cover datasets
-#   and plotting with the tmap package
-# . Zonal Stats Task 1: mean elevation and slope
-# . Zonal Stats Task 2: percent of catchment above an elevation threshold
-# . Zonal Stats Task 3: Percent 
-# . Task2
+# 1. RStudio bonus tip: use 'Projects'
+# 2. Accessing watershed polygons in R
+# 3. Writing/reading shapefiles
+# 4. Calculating polygon area
+# 5. Accessing elevation and land cover datasets
+#    and plotting with the tmap package
+# 6. Zonal Stats Task 1: mean elevation and slope
+# 7. Zonal Stats Task 2: percent of catchment above an elevation threshold
+# 8. Zonal Stats Task 3: Percent of catchment covered by NLCD cover classes
 
 ##########################################
-# . RStudio bonus tip: use 'Projects'
+# 1. RStudio bonus tip: use 'Projects'
 # 
 # Best practice is to create an RStudio Project in the folder that
 # contains your data. A Project automatically has the working 
-# directorty that matches the location of the project file (*.RProj).
+# directory that matches the location of the project file (*.RProj).
 ##########################################
 # getwd()
 
 ##########################################
-# . Accessing watershed polygons in R
+# 2. Accessing watershed polygons in R
 # 
 # To carry out zonal statistics, we need polygons and rasters. 
-# Now I will show you how to get NHDPlus watershed poygons in R. 
+# Now I will show you how to get NHDPlus watershed polygons in R. 
 # Then later, we will calculate some zonal statistics for these
 # watersheds.
 ##########################################
@@ -92,17 +91,17 @@ plot(start_point,add = T,col = "red")
 
 # Get all of the NHDPlus data that corresponds to the identfied flowlines
 NHDplus_data <- subset_nhdplus(comids = flowline$nhdplus_comid,
-                         output_file = tempfile(fileext = ".gpkg"),
-                         nhdplus_data = "download", 
-                         return_data = TRUE)
+                               output_file = tempfile(fileext = ".gpkg"),
+                               nhdplus_data = "download", 
+                               return_data = TRUE)
 
-# NHDplus_data is a list of simple features (analagous to a list of 
+# NHDplus_data is a list of simple features (analogous to a list of 
 # shapefiles)
 class(NHDplus_data)
 summary(NHDplus_data)
 
 # The NHD data is downloaded in a unprojected coordinate system, 
-# so I want to project it in order to calculate areas and do other 
+# so, I want to project it in order to calculate areas and do other 
 # zonal statistics.
 proj_crs <- "+proj=utm +zone=13 +datum=NAD83 +units=m +no_defs"
 # browseURL("https://www.nceas.ucsb.edu/sites/default/files/2020-04/OverviewCoordinateReferenceSystems.pdf")
@@ -131,7 +130,7 @@ start_point <- st_as_sf(start_point)
 start_point$legend <- "Point of Interest"
 
 ##########################################
-# Writing/reading shapefiles
+#3.  Writing/reading shapefiles
 ##########################################
 
 # Write catchment to working directory as a shapefile.
@@ -153,7 +152,7 @@ plot(flowline$geometry,add = T,col = "blue")
 # Simple as that!
 
 ##########################################
-# Calculate polygon area
+# 4. Calculate polygon area
 ##########################################
 
 # Area of the entire collection of polygons 
@@ -165,8 +164,8 @@ raster::area(as_Spatial(st_union(catchment)))/(1609.34^2)
 raster::area(as_Spatial(catchment))/(1609.34^2)
 
 ##########################################
-# Accessing elevation and land cover datasets
-# and plotting with the tmap package
+# 5. Accessing elevation and land cover datasets
+#     and plotting with the tmap package
 ##########################################
 
 # Because I want to perform zonal statistics on the 
@@ -184,22 +183,31 @@ plot(buf_catchment,col = "green",)
 plot(catchment$geometry,add = T,border = "red")
 
 # Get DEM using the FedData package
-# class(catchment)
-area_NED <- get_ned(template = as_Spatial(buf_catchment),
-                    extraction.dir = ".\\EXTRACTIONS\\NED\\",
-                     label = "30meter",
-                     res = "1",
-                     force.redo = F)
 
-# If get_ned doesn't work (it can be buggy), uncomment the 
-# code below to get the same data from my github site.
+# Because the FedData::get_ned function can be finicky, I provide
+# the tif file via a link to my github site as a failsafe way to run this code.
+# I encourage you to uncomment out the FedData::get_ned function below and see
+# if you can get it to run (email me or call for assistance). Its a nice tool, 
+# just touchy for unknown reasons.
 # 
 NEDurl <- "https://github.com/julianscott/ZonalStats/blob/master/30meter_NED_1.zip?raw=true"
 GET(NEDurl, write_disk("30meter_NED_1.zip", overwrite = TRUE))
 unzip(zipfile = "30meter_NED_1.zip",
       overwrite = TRUE)
 area_NED <- raster("30meter_NED_1.tif")
+# 
+# 
 
+# Uncomment get_ned() function below to test drive. If it doesn't work,
+# Don't despair, get in touch with me to troubleshoot.
+
+# area_NED <- get_ned(template = as_Spatial(buf_catchment),
+#                     extraction.dir = ".\\EXTRACTIONS\\NED\\",
+#                     label = "30meter",
+#                     res = "1",
+#                     force.redo = F)
+
+# Make the variable name of the raster more intuitive.
 names(area_NED) <- "elev"
 
 # Transform elevation raster to match our projected coordinate system
@@ -207,7 +215,7 @@ area_NED <- raster::projectRaster(from = area_NED,
                                   res = c(30,30),
                                   crs = proj_crs)
 
-# Convert elevations into feet. This is analagous to raster calculator in ArcGIS.
+# Convert elevations into feet. This is analogous to raster calculator in ArcGIS.
 area_NED <- area_NED*3.2808
 
 # dev.off()
@@ -215,10 +223,19 @@ plot(area_NED)
 plot(catchment$geometry,border = "black",add = T)
 plot(flowline$geometry,add = T,col = "blue")
 
-# Plot using tmap
+# Plot using tmap. Note that running ttm() switches between static and 
+# interactive plotting.
+# 
+# The interactive plotting allows you to easilu see basemaps, like earth imagery
+# and to move around like google earth or ArcGIS. In interactive mode, layers 
+# can be turned on and off by clicking the hamburger icon in the upper right.
+
+# Activate switch. Note the console readout to see if it is set to interactive
+# or normal plotting. Re-run ttm() to swich until set to interactive.
 ttm()
 
-# To use the interactive plotting function of tmap, the rasters must be in the following projection.
+# To use the interactive plotting function of tmap, the rasters must be 
+# in the following projection.
 merc_crs <- "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0
 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs"
 area_NED_merc <- projectRaster(area_NED,crs = merc_crs)
@@ -234,31 +251,45 @@ elev_map <- tm_shape(area_NED_merc)+
             legend.position = c("left","top"),
             attr.position = c("left","bottom"))
 
-# Note the layers that are available by default
 elev_map
 
-# Add world imagery
+
+# Note the layers that are available by default. 
+# Does not include satellite imagery.
+# Add world imagery like this:
 tmap_options(basemaps = c(Canvas = "Esri.WorldGrayCanvas",
                           Imagery = "Esri.WorldImagery",
                           StreetMap = "OpenStreetMap",
                           Topo = "Esri.WorldTopoMap"))
 
+# Remap to see results with world imagery layer available.
 elev_map
 
+# Get National Land Cover Dataset raster for catchments
+
+# Because the FedData::get_nlcd function can be finicky, I provide
+# the tif file via a link to my github site as a failsafe way to run this code.
+# I encourage you to uncomment out the FedData::get_nlcd function below and see
+# if you can get it to run (email me or call for assistance). Its a nice tool, 
+# just touchy for unknown reasons.
+
+NLCDurl <- "https://github.com/julianscott/ZonalStats/blob/master/NLCD_2016_Land_Cover_L48.zip?raw=true"
+GET(NLCDurl, write_disk("NLCD_2016_Land_Cover_L48.zip", overwrite = TRUE))
+unzip(zipfile = "NLCD_2016_Land_Cover_L48.zip",
+      overwrite = TRUE)
+area_NLCD <- raster("NLCD_2016_Land_Cover_L48.tif")
+
+# Uncomment get_ned() function below to test drive. If it doesn't work,
+# Don't despair, get in touch with me to troubleshoot.
+
 # Get National Land Cover Dataset
-area_NLCD <- get_nlcd(template = buf_catchment,
-                      extraction.dir = ".\\EXTRACTIONS\\NLCD\\",
-                      label = "NLCD",
-                      landmass = "L48",force.redo = T)
+# area_NLCD <- get_nlcd(template = buf_catchment,
+#                       extraction.dir = ".\\EXTRACTIONS\\NLCD\\",
+#                       label = "NLCD",
+#                       landmass = "L48",force.redo = T)
 
 # If get_nlcd doesn't work (it can be buggy), uncomment the 
 # code below to get the same data from my github site.
-# 
-# NLCDurl <- "https://github.com/julianscott/ZonalStats/blob/master/NLCD_2016_Land_Cover_L48.zip?raw=true"
-# GET(NLCDurl, write_disk("NLCD_2016_Land_Cover_L48.zip", overwrite = TRUE))
-# unzip(zipfile = "NLCD_2016_Land_Cover_L48.zip",
-#       overwrite = TRUE)
-# area_NLCD <- raster("NLCD_2016_Land_Cover_L48.tif")
 
 # Transform NED raster to match our working coordinate system
 area_NLCD <- raster::projectRaster(from = area_NLCD,
@@ -266,15 +297,23 @@ area_NLCD <- raster::projectRaster(from = area_NLCD,
                                    crs = proj_crs,
                                    method = "ngb")
 
+# Awesome color palette tool!
 # tmaptools::palette_explorer()
+
+# Another way to set the palette using brewer.pal...
 # mycolors <- colorRampPalette(brewer.pal(9,'Spectral'))(16)
+
+# To use the interactive plotting function of tmap, the NLCD raster must be 
+# in the merc_crs projectio (defined above).
 area_NLCD_merc <- projectRaster(area_NLCD,crs = merc_crs,method = "ngb")
 
+# Get more descriptive class names to match the integer key for the cover classes.
 unique(area_NLCD)
 nlcdclass <- fread("https://raw.githubusercontent.com/julianscott/ZonalStats/master/NLCD_classes.csv")
 
 nlcdclass
 
+# Map NLCD cover for study area using tmap.
 cover_map <- tm_shape(area_NLCD_merc)+
   tm_raster("NLCD_2016_Land_Cover_L48",title = "NLCD 2016",
             # palette = mycolors,
@@ -283,8 +322,8 @@ cover_map <- tm_shape(area_NLCD_merc)+
             labels = nlcdclass$Class,
             colorNA = "black",
             alpha = 0.6)+
-            # legend.hist = TRUE, 
-            # legend.hist.title = "Frequency of land cover classes")+
+  # legend.hist = TRUE, 
+  # legend.hist.title = "Frequency of land cover classes")+
   tm_layout(frame = F,
             inner.margins = c(0.02,0.3,0.06,0.02),
             legend.position = c("left","top"),
@@ -293,21 +332,21 @@ cover_map <- tm_shape(area_NLCD_merc)+
 
 cover_map
 
-# Map vector data 
+# Map vector data (catchments, flowlines...)
 vector_map <-
   tm_shape(catchment)+
-    tm_polygons(col = "legend",alpha = 0,border.col = "#7570B3",title = "",
+  tm_polygons(col = "legend",alpha = 0,border.col = "#7570B3",title = "",
               lwd = 2)+
   tm_shape(waterbody)+
-    tm_polygons(col = "legend",palette = "#6baed6",border.col ="black",
-                title = "",lwd = 0.5,
-                popup.vars = c("gnis_name","meandepth"))+
+  tm_polygons(col = "legend",palette = "#6baed6",border.col ="black",
+              title = "",lwd = 0.5,
+              popup.vars = c("gnis_name","meandepth"))+
   tm_shape(start_point)+
-    tm_dots(col = "legend",size = 0.5,shape = 16,palette = "red",title = "")+
+  tm_dots(col = "legend",size = 0.5,shape = 16,palette = "red",title = "")+
   tm_shape(flowline)+
-    tm_lines(col = "legend",palette = "blue",title.col = "",
-             popup.vars = c("gnis_name","slope","streamorde"))+
-    # tm_format("NLD_wide")+
+  tm_lines(col = "legend",palette = "blue",title.col = "",
+           popup.vars = c("gnis_name","slope","streamorde"))+
+  # tm_format("NLD_wide")+
   tm_layout(frame = F,
             inner.margins = c(0.02,0.3,0.06,0.02),
             legend.position = c("left","top"),
@@ -317,11 +356,15 @@ vector_map <-
 vector_map
 
 # OVerlay shapefiles on raster data
-# dev.new(width=5, height=4, unit="in")
+
+# dev.new(width=5, height=4, unit="in") # this code will create a
+ # new plotting device that is big enough to provide good detail.
+ 
+# Plot all three maps together.
 elev_map + cover_map + vector_map 
 
 ##########################################
-#  Zonal Stats Task 1: mean elevation
+#6. Zonal Stats Task 1: mean elevation
 ##########################################
 
 # Get Mean Elevation for each catchment
@@ -340,8 +383,8 @@ slope_raster <- raster::terrain(area_NED,"slope","degrees")
 
 # Get Mean slope for each catchment
 mean_slope_deg <- raster::extract(slope_raster,
-                                      catchment,
-                                      fun = mean) 
+                                  catchment,
+                                  fun = mean) 
 
 # Attach mean elevation and slope to the catchment object
 catchment$elev_ft <- mean_elevations_ft[,1]
@@ -349,7 +392,10 @@ catchment$slope_deg <- mean_slope_deg[,1]
 View(catchment)
 
 # Plot results
+# 
+# Switch tmap to static plotting mode.
 ttm()
+
 tm_shape(catchment)+
   tm_polygons(col = c("elev_ft","slope_deg"),palette = terrain.colors(10),n=10)+
   tm_layout(frame = F,
@@ -369,7 +415,6 @@ catchment %>%
 catchment$elevClass <- if_else(catchment$elev_ft >= 11000,"elev >= 11000","elev < 11000")
 
 # Plot results
-ttm()
 tm_shape(catchment)+
   tm_polygons(col = "elevClass",palette = terrain.colors(2),n=10)+
   tm_layout(frame = F,
@@ -377,7 +422,6 @@ tm_shape(catchment)+
             legend.position = c("left","top"),
             attr.position = c("left","bottom"),
             legend.show = T)
-  
 
 # Present results as table, sorted  by elevClass
 catchment %>% 
@@ -387,12 +431,12 @@ catchment %>%
   head()
 
 ##########################################
-# Zonal Stats Task 2: For a each catchment, 
-# determine the percentage of catchment above 
-# a certain elevation threshold. 
+# 7. Zonal Stats Task 2: For each catchment, 
+#                       determine the percentage of catchment above 
+#                       a certain elevation threshold. 
 ###########################################
 
-# Lets work with a single catchment first.
+# Let’s work with a single catchment first.
 catch15 <- catchment[15,] #[row, column]
 
 # Extract elevation for each cell covered by catchment15
@@ -405,7 +449,7 @@ ggplot()+
   geom_histogram()+
   geom_vline(aes(xintercept = mean(catch15_elevs)),color = "red")
 
-# Now, lets find the proportion of the catchment above 10000 feet 
+# Now, let’s find the proportion of the catchment above 10000 feet 
 length(catch15_elevs[catch15_elevs >= 10000])/length(catch15_elevs)
 # [1] 0.7929027
 
@@ -423,7 +467,7 @@ str(cell_elevations_ft)
 # And use sapply to calculate the proportion of each catchment 
 # above the threshold
 frac_high_elev <- sapply(cell_elevations_ft,
-       function(x) length(x[x >= threshold])/length(x))
+                         function(x) length(x[x >= threshold])/length(x))
 frac_high_elev
 
 # Add results to the catchment object
@@ -446,16 +490,12 @@ catchment %>%
   head()
 
 #############################################
-#  NLCD work
-#############################################
-
-#############################################
-# . Zonal Stats Task 3: Get the percent of each 
+#8. Zonal Stats Task 3: Get the percent of each 
 #                       catchment in each category
 #                       of land cover
 #############################################
 
-# First, lets look at the area_NLCD raster
+# First, let’s look at the area_NLCD raster
 area_NLCD
 # Note the raster data name is NLCD_2016_Land_Cover_L48
 
@@ -484,7 +524,7 @@ summary(NLCD_classes)
 NLCD_classes <- rename(NLCD_classes,"catchment" = "ID")
 head(NLCD_classes)
 
-# The packages dplyr and tidyr are excellent for summarising data.  
+# The packages dplyr and tidyr are excellent for summarizing data.  
 browseURL("https://tidyr.tidyverse.org/")
 
 # The task is to get the percent of each catchment in each category
@@ -498,7 +538,7 @@ head(NLCD_grouped)
 # Count the number of observations in each group 
 NCLD_tallied <- tally(NLCD_grouped)
 View(NCLD_tallied)
-  
+
 # Put the cell counts for each cover type its own column
 NCLD_tallied_wider <- pivot_wider(NCLD_tallied,
                                   names_from = NLCD_2016_Land_Cover_L48,
@@ -507,7 +547,7 @@ NCLD_tallied_wider <- pivot_wider(NCLD_tallied,
 # For each catchment we have the number of cells covered by each land cover type.
 View(NCLD_tallied_wider)
 
-# So that was step-by-step, but it can be done much more succictly.
+# So that was step-by-step, but it can be done much more succinctly.
 # Here is the power of tidyverse and the piping operator, %>% 
 
 # Start the piping chain with the NLCD_classes dataframe
@@ -560,7 +600,7 @@ NLCD_classes_results <- NLCD_classes_results %>%
   # change the name of the cover class and make numeric 
   mutate(class_num = as.numeric(class_num)) %>% 
   # join (like vlookup in excel) with the table of NLCD land cover 
-  # class names and numebrs
+  # class names and numbers
   left_join(nlcdclass,by= c("class_num" = "NLCDnumber")) %>% 
   # use join to add catchment id, instead of the simple order id
   left_join(data.frame("catchmentID" = catchment$id,"order" = 1:nrow(catchment)),
