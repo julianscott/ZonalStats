@@ -136,9 +136,6 @@ start_point$legend <- "Point of Interest"
 # Write catchment to working directory as a shapefile.
 st_write(catchment,"StudyArea_catchments.shp",delete_layer = T)
 
-# Write catchment to a folder within your working directory.
-st_write(catchment,"./junkfolder/StudyArea_catchments.shp",delete_layer = T)
-
 # Remove the catchment object from your R environment.
 rm(catchment)
 
@@ -194,9 +191,8 @@ NEDurl <- "https://github.com/julianscott/ZonalStats/blob/master/30meter_NED_1.z
 GET(NEDurl, write_disk("30meter_NED_1.zip", overwrite = TRUE))
 unzip(zipfile = "30meter_NED_1.zip",
       overwrite = TRUE)
+
 area_NED <- raster("30meter_NED_1.tif")
-# 
-# 
 
 # Uncomment get_ned() function below to test drive. If it doesn't work,
 # Don't despair, get in touch with me to troubleshoot.
