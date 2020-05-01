@@ -1,9 +1,32 @@
-# Julian A Scott 04/22/20
+# Julian A Scott 04/29/20
 # jascott@usda.gov
 # Zonal Stats Webinar
+# 
+# This script and webinar targets intermediate to advanced R users, though
+# an ambitious beginner will find it useful as well.
+# 
+# Code is intended to be run line by line (press control+enter to 
+# run current line and advance to next line).
+# 
+# You may uncomment out lines deleting the # or by
+# pressing 'control+shift+c' to multiple selected lines or 
+# just the line where your cursor is located.
+# 
+# Note that some of these packages are on the larger side, 
+# so the first install may take a couple minutes. 
+# 
+# Also note that the code has been vetted on R versions 3.6.2 
+# and greater. Check your R version like this:
+version
 
-# First, here is a list of the required packages
-packages <- c("tmap","sf","tidyverse","sp","nhdplusTools","raster","FedData","prism","RColorBrewer","data.table","rgdal","httr")
+
+# Begin script.
+
+# First, here is a list of useful packages 
+# (some required for this webinar and some aren't)
+packages <- c("tmap","sf","tidyverse","sp","nhdplusTools","raster",
+              "FedData","prism","RColorBrewer","data.table","rgdal",
+              "httr")
 
 packages
 
