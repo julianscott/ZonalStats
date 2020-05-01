@@ -1,6 +1,6 @@
 # Julian A Scott 
 # 04/29/20
-# jascott@usda.gov
+# julian.a.scott@usda.gov
 # Zonal Stats Webinar
 # 
 # This script and webinar targets intermediate to advanced R users, though
